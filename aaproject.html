@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodePlay - Learn to Code. Build Something.</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darker: '#090d16',
+                        darkcard: '#131c31',
+                        darkborder: '#1e293b',
+                        accent: '#6366f1',
+                        accenthover: '#4f46e5'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Collection -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&family=Montserrat:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&family=Oswald:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        code, pre, .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        .glass-card {
+            background: rgba(19, 28, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-darker text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- ==================== WELCOME SCREEN ==================== -->
+    <div id="welcome-screen" class="fixed inset-0 z-50 bg-darker flex items-center justify-center p-4 overflow-hidden">
+        <!-- Background Glow Elements -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="glass-card max-w-lg w-full p-8 sm:p-10 rounded-3xl text-center space-y-6 shadow-2xl border border-indigo-500/20 animate-fade-in relative z-10">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center mx-auto shadow-lg shadow-indigo-500/40">
+                <i class="fa-solid fa-code text-white text-2xl"></i>
+            </div>
+            <div class="space-y-3">
+                <span class="text-xs font-semibold text-indigo-400 uppercase tracking-widest">🚀 CodePlay</span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                    Learn to Code.<br>
+                    <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Build Something.</span>
+                </h1>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed pt-1">
+                    Belajar coding secara interaktif, langsung praktik, dan bangun project pertamamu.
+                </p>
+            </div>
+            <div class="pt-2">
+                <button onclick="enterCodePlay()" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-base shadow-xl shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center mx-auto space-x-2">
+                    <span>Start Learning</span>
+                    <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 border border-indigo-500/30 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-msg" class="text-sm font-medium">Code copied!</span>
+    </div>
+
+    <!-- Navbar -->
+    <header id="main-header" class="sticky top-0 z-40 w-full glass-card border-b border-darkborder hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-code text-white text-lg"></i>
+                </div>
+                <span class="text-xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">CodePlay</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-0.5 lg:space-x-1">
+                <button onclick="switchView('home')" class="nav-btn px-2.5 py-2 rounded-lg text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="home">Home</button>
+                <button onclick="switchView('learn')" class="nav-btn px-2.5 py-2 rounded-lg text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="learn">Learn</button>
+                <button onclick="switchView('playground')" class="nav-btn px-2.5 py-2 rounded-lg text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="playground">Playground</button>
+                <button onclick="switchView('challenges')" class="nav-btn px-2.5 py-2 rounded-lg text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="challenges">Challenges</button>
+                <button onclick="switchView('quiz')" class="nav-btn px-2.5 py-2 rounded-lg text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="quiz">Quiz</button>
+                <button onclick="switchView('projects')" class="nav-btn px-2.5 py-2 rounded-lg text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="projects">Projects</button>
+                <button onclick="switchView('buttongenerator')" class="nav-btn px-2 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="buttongenerator">Btn Gen</button>
+                <button onclick="switchView('cardgenerator')" class="nav-btn px-2 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="cardgenerator">Card Gen</button>
+                <button onclick="switchView('textgenerator')" class="nav-btn px-2 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="textgenerator">Text Gen</button>
+                <button onclick="switchView('colorpicker')" class="nav-btn px-2 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="colorpicker">Colors</button>
+                <button onclick="switchView('cheatsheet')" class="nav-btn px-2 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition" data-target="cheatsheet">Cheat Sheet</button>
+            </nav>
+
+            <!-- User Progress Mini / Mobile Menu Button -->
+            <div class="flex items-center space-x-3">
+                <div class="hidden sm:flex items-center bg-darkcard border border-darkborder px-3 py-1.5 rounded-full text-xs font-semibold">
+                    <i class="fa-solid fa-fire text-amber-500 mr-1.5"></i>
+                    <span id="global-progress-text">Progress: 23%</span>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2 focus:outline-none">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden glass-card border-t border-darkborder px-4 pt-2 pb-4 space-y-1 animate-fade-in">
+            <button onclick="switchView('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Home</button>
+            <button onclick="switchView('learn'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Learn</button>
+            <button onclick="switchView('playground'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Playground</button>
+            <button onclick="switchView('challenges'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Challenges</button>
+            <button onclick="switchView('quiz'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Quiz</button>
+            <button onclick="switchView('projects'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Projects</button>
+            <button onclick="switchView('buttongenerator'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Button Generator</button>
+            <button onclick="switchView('cardgenerator'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Card Generator</button>
+            <button onclick="switchView('textgenerator'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Text Style Generator</button>
+            <button onclick="switchView('colorpicker'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Color Picker</button>
+            <button onclick="switchView('cheatsheet'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800">Cheat Sheet</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main id="main-content" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
+
+        <!-- ==================== HOME VIEW ==================== -->
+        <section id="view-home" class="view-section animate-fade-in space-y-16">
+            <!-- Hero Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pt-8">
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/20 px-3.5 py-1.5 rounded-full text-indigo-400 text-xs font-semibold tracking-wide uppercase">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span>Platform Belajar Coding Gen Z</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+                        Learn to Code. <br>
+                        <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Build Something.</span>
+                    </h1>
+                    <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto lg:mx-0">
+                        Belajar pemrograman dengan cara interaktif, seru, dan tidak membosankan. Langsung praktek, selesaikan tantangan, dan buat project pertamamu hari ini!
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                        <button onclick="switchView('learn')" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                            Start Learning <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                        <button onclick="switchView('playground')" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-darkcard border border-darkborder hover:border-slate-700 text-slate-200 font-semibold transition">
+                            Open Playground <i class="fa-solid fa-laptop-code ml-2 text-indigo-400"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hero Code Preview Card -->
+                <div class="lg:col-span-5">
+                    <div class="glass-card rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+                        <div class="bg-slate-900/90 px-4 py-3 border-b border-darkborder flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                <span class="text-xs text-slate-400 ml-2 font-mono">index.html</span>
+                            </div>
+                            <span class="text-xs text-indigo-400 font-semibold">Live Preview</span>
+                        </div>
+                        <div class="p-4 bg-slate-950/80 font-mono text-xs sm:text-sm text-slate-300 space-y-1">
+                            <p><span class="text-pink-400">&lt;!DOCTYPE</span> <span class="text-indigo-300">html</span><span class="text-pink-400">&gt;</span></p>
+                            <p><span class="text-pink-400">&lt;html&gt;</span></p>
+                            <p class="pl-4"><span class="text-pink-400">&lt;body</span> <span class="text-sky-300">style</span>=<span class="text-emerald-300">"background:#090d16"</span><span class="text-pink-400">&gt;</span></p>
+                            <p class="pl-8"><span class="text-pink-400">&lt;h1</span> <span class="text-sky-300">class</span>=<span class="text-emerald-300">"text-white"</span><span class="text-pink-400">&gt;</span>Hello CodePlay! 🚀<span class="text-pink-400">&lt;/h1&gt;</span></p>
+                            <p class="pl-4"><span class="text-pink-400">&lt;/body&gt;</span></p>
+                            <p><span class="text-pink-400">&lt;/html&gt;</span></p>
+                        </div>
+                        <div class="bg-indigo-950/30 p-3 border-t border-darkborder text-xs text-indigo-300 flex items-center justify-between">
+                            <span>Status: Ready to run</span>
+                            <button onclick="switchView('playground')" class="text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded-md text-xs font-medium transition">Try in Playground</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What do you want to learn? -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold tracking-tight">What do you want to learn?</h2>
+                    <button onclick="switchView('learn')" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center">
+                        View All <i class="fa-solid fa-chevron-right ml-1.5 text-xs"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- HTML Card -->
+                    <div onclick="openCategory('html')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1 group">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-brands fa-html5"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">HTML</h3>
+                        <p class="text-slate-400 text-xs mb-4">Struktur dasar kerangka halaman website modern.</p>
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>5 Modul</span>
+                            <span class="text-indigo-400 font-semibold group-hover:underline">Belajar →</span>
+                        </div>
+                    </div>
+                    <!-- CSS Card -->
+                    <div onclick="openCategory('css')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1 group">
+                        <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-brands fa-css3-alt"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">CSS</h3>
+                        <p class="text-slate-400 text-xs mb-4">Percantik tampilan web dengan styling & animasi keren.</p>
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>5 Modul</span>
+                            <span class="text-indigo-400 font-semibold group-hover:underline">Belajar →</span>
+                        </div>
+                    </div>
+                    <!-- JavaScript Card -->
+                    <div onclick="openCategory('javascript')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1 group">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-brands fa-js"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">JavaScript</h3>
+                        <p class="text-slate-400 text-xs mb-4">Buat websitemu interaktif, dinamis, dan bernyawa.</p>
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>5 Modul</span>
+                            <span class="text-indigo-400 font-semibold group-hover:underline">Belajar →</span>
+                        </div>
+                    </div>
+                    <!-- Programming Basics Card -->
+                    <div onclick="openCategory('basics')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1 group">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">Programming Basics</h3>
+                        <p class="text-slate-400 text-xs mb-4">Pahami logika dasar, variabel, dan algoritma pemula.</p>
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>4 Modul</span>
+                            <span class="text-indigo-400 font-semibold group-hover:underline">Belajar →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Summary Widget -->
+            <div class="glass-card p-6 rounded-2xl border border-indigo-500/20 bg-gradient-to-r from-indigo-950/20 to-purple-950/20">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Your Learning Progress</h3>
+                        <p class="text-slate-400 text-xs">Progress belajar otomatis tersimpan di browser Anda.</p>
+                    </div>
+                    <div class="flex items-center space-x-6 w-full sm:w-auto">
+                        <div class="flex-1 sm:w-48">
+                            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                                <span>HTML</span>
+                                <span id="home-html-prog">40%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div id="home-html-bar" class="bg-orange-500 h-full rounded-full transition-all duration-500" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="flex-1 sm:w-48">
+                            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                                <span>CSS</span>
+                                <span id="home-css-prog">20%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div id="home-css-bar" class="bg-sky-500 h-full rounded-full transition-all duration-500" style="width: 20%"></div>
+                            </div>
+                        </div>
+                        <div class="flex-1 sm:w-48">
+                            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                                <span>JavaScript</span>
+                                <span id="home-js-prog">10%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div id="home-js-bar" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 10%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LEARN VIEW ==================== -->
+        <section id="view-learn" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">Learning Center</h1>
+                <p class="text-slate-400 text-sm mt-1">Pilih kategori materi dan mulai belajar langkah demi langkah.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- HTML Category -->
+                <div onclick="openCategory('html')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-2xl">
+                            <i class="fa-brands fa-html5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">HTML</h3>
+                            <span class="text-xs text-slate-400">5 Lessons Available</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-4">Pelajari tag dasar, heading, paragraf, gambar, link, dan form HTML.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-darkborder text-xs">
+                        <span class="text-indigo-400 font-medium">Mulai Belajar</span>
+                        <i class="fa-solid fa-arrow-right text-indigo-400"></i>
+                    </div>
+                </div>
+                <!-- CSS Category -->
+                <div onclick="openCategory('css')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-2xl">
+                            <i class="fa-brands fa-css3-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">CSS</h3>
+                            <span class="text-xs text-slate-400">5 Lessons Available</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-4">Pahami selector, warna, box model, flexbox, dan grid layout.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-darkborder text-xs">
+                        <span class="text-indigo-400 font-medium">Mulai Belajar</span>
+                        <i class="fa-solid fa-arrow-right text-indigo-400"></i>
+                    </div>
+                </div>
+                <!-- JavaScript Category -->
+                <div onclick="openCategory('javascript')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-2xl">
+                            <i class="fa-brands fa-js"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">JavaScript</h3>
+                            <span class="text-xs text-slate-400">5 Lessons Available</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-4">Kuasai DOM manipulation, event listener, function, dan array.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-darkborder text-xs">
+                        <span class="text-indigo-400 font-medium">Mulai Belajar</span>
+                        <i class="fa-solid fa-arrow-right text-indigo-400"></i>
+                    </div>
+                </div>
+                <!-- Programming Basics Category -->
+                <div onclick="openCategory('basics')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Dasar Programming</h3>
+                            <span class="text-xs text-slate-400">4 Lessons Available</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-4">Konsep fundamental software, compiler vs interpreter, dan sintaks.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-darkborder text-xs">
+                        <span class="text-indigo-400 font-medium">Mulai Belajar</span>
+                        <i class="fa-solid fa-arrow-right text-indigo-400"></i>
+                    </div>
+                </div>
+                <!-- Logic Programming Category -->
+                <div onclick="openCategory('logic')" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-indigo-500/50 transition transform hover:-translate-y-1">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Logika Programming</h3>
+                            <span class="text-xs text-slate-400">4 Lessons Available</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-4">Latihan conditional if-else, perulangan loops, dan problem solving.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-darkborder text-xs">
+                        <span class="text-indigo-400 font-medium">Mulai Belajar</span>
+                        <i class="fa-solid fa-arrow-right text-indigo-400"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LESSON DETAIL VIEW ==================== -->
+        <section id="view-lesson-detail" class="view-section hidden animate-fade-in space-y-6">
+            <div class="flex items-center justify-between border-b border-darkborder pb-4">
+                <button onclick="switchView('learn')" class="text-slate-400 hover:text-white text-sm flex items-center font-medium">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Learn
+                </button>
+                <span id="lesson-category-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">HTML Basics</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-7 space-y-6">
+                    <div>
+                        <h1 id="lesson-title" class="text-2xl sm:text-3xl font-bold text-white mb-2">Judul Materi</h1>
+                        <p id="lesson-desc" class="text-slate-300 text-sm leading-relaxed">Penjelasan singkat materi...</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Contoh Kode</span>
+                            <button onclick="copyLessonCode()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center bg-darkcard px-2.5 py-1 rounded-md border border-darkborder">
+                                <i class="fa-regular fa-copy mr-1.5"></i> Copy Code
+                            </button>
+                        </div>
+                        <div class="glass-card rounded-xl p-4 bg-slate-950 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto border border-darkborder">
+                            <pre id="lesson-code-content">&lt;h1&gt;Hello World&lt;/h1&gt;</pre>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4">
+                        <button onclick="prevLesson()" id="prev-lesson-btn" class="px-4 py-2 rounded-xl bg-darkcard border border-darkborder text-slate-300 hover:bg-slate-800 text-sm font-semibold transition">
+                            <i class="fa-solid fa-arrow-left mr-2"></i> Sebelumnya
+                        </button>
+                        <button onclick="nextLesson()" id="next-lesson-btn" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition">
+                            Next Lesson <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preview Panel -->
+                <div class="lg:col-span-5 space-y-3">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Preview</span>
+                    <div class="glass-card rounded-xl overflow-hidden border border-darkborder h-80 sm:h-96 bg-white flex flex-col">
+                        <div class="bg-slate-100 px-3 py-2 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs">
+                            <div class="flex items-center space-x-1.5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                            </div>
+                            <span>preview.html</span>
+                        </div>
+                        <iframe id="lesson-preview-frame" class="w-full flex-grow border-0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PLAYGROUND VIEW ==================== -->
+        <section id="view-playground" class="view-section hidden animate-fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-darkborder pb-4">
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight">Code Playground</h1>
+                    <p class="text-slate-400 text-xs">Tulis kode HTML, CSS, dan JavaScript lalu jalankan secara instan.</p>
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+                    <button onclick="runPlayground()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30 flex items-center">
+                        <i class="fa-solid fa-play mr-1.5"></i> Run
+                    </button>
+                    <button onclick="resetPlayground()" class="px-3 py-2 rounded-xl bg-darkcard border border-darkborder text-slate-300 hover:bg-slate-800 text-xs font-semibold flex items-center">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Reset
+                    </button>
+                    <button onclick="clearPlayground()" class="px-3 py-2 rounded-xl bg-darkcard border border-darkborder text-slate-300 hover:bg-slate-800 text-xs font-semibold flex items-center">
+                        <i class="fa-solid fa-trash mr-1.5"></i> Clear
+                    </button>
+                    <button onclick="copyPlaygroundCode()" class="px-3 py-2 rounded-xl bg-darkcard border border-darkborder text-slate-300 hover:bg-slate-800 text-xs font-semibold flex items-center">
+                        <i class="fa-regular fa-copy mr-1.5"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Playground Layout: Split Editor and Preview -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Editors Column -->
+                <div class="lg:col-span-6 space-y-4">
+                    <!-- Tab Selector for Editors -->
+                    <div class="flex border-b border-darkborder">
+                        <button onclick="switchEditorTab('html')" id="tab-btn-html" class="px-4 py-2 text-xs font-bold text-indigo-400 border-b-2 border-indigo-500">HTML</button>
+                        <button onclick="switchEditorTab('css')" id="tab-btn-css" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-slate-200">CSS</button>
+                        <button onclick="switchEditorTab('js')" id="tab-btn-js" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-slate-200">JavaScript</button>
+                    </div>
+
+                    <!-- Textarea Editor Boxes -->
+                    <div class="glass-card rounded-xl overflow-hidden border border-darkborder relative">
+                        <!-- HTML Editor Pane -->
+                        <div id="editor-pane-html" class="editor-pane">
+                            <div class="bg-slate-900/80 px-3 py-1.5 border-b border-darkborder text-xs text-orange-400 font-mono font-semibold">HTML Editor</div>
+                            <textarea id="code-html" class="w-full h-80 bg-slate-950 p-4 font-mono text-xs text-slate-200 focus:outline-none resize-none" placeholder="&lt;h1&gt;Hello CodePlay&lt;/h1&gt;"></textarea>
+                        </div>
+                        <!-- CSS Editor Pane -->
+                        <div id="editor-pane-css" class="editor-pane hidden">
+                            <div class="bg-slate-900/80 px-3 py-1.5 border-b border-darkborder text-xs text-sky-400 font-mono font-semibold">CSS Editor</div>
+                            <textarea id="code-css" class="w-full h-80 bg-slate-950 p-4 font-mono text-xs text-slate-200 focus:outline-none resize-none" placeholder="h1 { color: #6366f1; text-align: center; margin-top: 50px; }"></textarea>
+                        </div>
+                        <!-- JS Editor Pane -->
+                        <div id="editor-pane-js" class="editor-pane hidden">
+                            <div class="bg-slate-900/80 px-3 py-1.5 border-b border-darkborder text-xs text-amber-400 font-mono font-semibold">JavaScript Editor</div>
+                            <textarea id="code-js" class="w-full h-80 bg-slate-950 p-4 font-mono text-xs text-slate-200 focus:outline-none resize-none" placeholder="console.log('Playground ready!');"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Column -->
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Output Preview</span>
+                        <button onclick="toggleFullscreenPreview()" class="text-xs text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-expand mr-1"></i> Fullscreen</button>
+                    </div>
+                    <div id="preview-container" class="glass-card rounded-xl overflow-hidden border border-darkborder h-96 sm:h-[412px] bg-white flex flex-col">
+                        <div class="bg-slate-100 px-3 py-2 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs">
+                            <div class="flex items-center space-x-1.5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                            </div>
+                            <span id="preview-status" class="text-emerald-600 font-medium">● Running</span>
+                        </div>
+                        <iframe id="playground-preview" class="w-full flex-grow border-0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CHALLENGES VIEW ==================== -->
+        <section id="view-challenges" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">Coding Challenges</h1>
+                <p class="text-slate-400 text-sm mt-1">Uji kemampuan coding kamu dengan tantangan praktis dari tingkat dasar hingga mahir.</p>
+            </div>
+            <div id="challenges-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- ==================== CHALLENGE DETAIL VIEW ==================== -->
+        <section id="view-challenge-detail" class="view-section hidden animate-fade-in space-y-6">
+            <div class="flex items-center justify-between border-b border-darkborder pb-4">
+                <button onclick="switchView('challenges')" class="text-slate-400 hover:text-white text-sm flex items-center font-medium">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Challenges
+                </button>
+                <span id="challenge-badge-diff" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Easy</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-6 space-y-6">
+                    <div>
+                        <h1 id="ch-detail-title" class="text-2xl font-bold text-white mb-2">Judul Challenge</h1>
+                        <p id="ch-detail-instructions" class="text-slate-300 text-sm leading-relaxed">Instruksi tantangan...</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Code Editor</span>
+                        <div class="glass-card rounded-xl overflow-hidden border border-darkborder">
+                            <div class="bg-slate-900 px-3 py-1.5 border-b border-darkborder flex justify-between items-center text-xs text-slate-400 font-mono">
+                                <span>solution.html</span>
+                                <button onclick="resetCurrentChallenge()" class="text-amber-400 hover:underline">Reset Code</button>
+                            </div>
+                            <textarea id="ch-code-editor" class="w-full h-64 bg-slate-950 p-4 font-mono text-xs text-slate-200 focus:outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <button onclick="runChallengeCode()" class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-600/30 transition flex items-center justify-center">
+                            <i class="fa-solid fa-play mr-2"></i> Run Code
+                        </button>
+                        <button onclick="checkChallengeAnswer()" class="flex-1 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition flex items-center justify-center">
+                            <i class="fa-solid fa-circle-check mr-2"></i> Check Answer
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 space-y-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Preview Hasil</span>
+                    <div class="glass-card rounded-xl overflow-hidden border border-darkborder h-[420px] bg-white flex flex-col">
+                        <div class="bg-slate-100 px-3 py-2 border-b border-slate-200 text-slate-600 text-xs flex items-center justify-between">
+                            <span>Output</span>
+                            <span id="ch-feedback-status" class="text-slate-500 font-medium">Belum diuji</span>
+                        </div>
+                        <iframe id="ch-preview-frame" class="w-full flex-grow border-0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== QUIZ VIEW ==================== -->
+        <section id="view-quiz" class="view-section hidden animate-fade-in space-y-8 max-w-3xl mx-auto">
+            <div class="border-b border-darkborder pb-4 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight">Coding Quiz</h1>
+                    <p class="text-slate-400 text-xs">Uji pemahaman teori dan logika kodingmu.</p>
+                </div>
+                <span id="quiz-progress-indicator" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Question 1 / 10</span>
+            </div>
+
+            <!-- Quiz Card Box -->
+            <div id="quiz-card" class="glass-card p-6 sm:p-8 rounded-2xl border border-darkborder space-y-6">
+                <div class="space-y-3">
+                    <span id="quiz-cat-tag" class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">HTML & CSS</span>
+                    <h2 id="quiz-question" class="text-lg sm:text-xl font-bold text-white">Pertanyaan quiz akan muncul di sini...</h2>
+                    <div id="quiz-code-box" class="hidden bg-slate-950 p-4 rounded-xl border border-darkborder font-mono text-xs text-slate-200 overflow-x-auto">
+                        <pre id="quiz-code-text"></pre>
+                    </div>
+                </div>
+
+                <!-- Options List -->
+                <div id="quiz-options" class="space-y-3">
+                    <!-- Dynamically populated options -->
+                </div>
+
+                <!-- Feedback & Next Button -->
+                <div id="quiz-feedback-box" class="hidden pt-4 border-t border-darkborder space-y-4">
+                    <div id="quiz-feedback-msg" class="text-sm font-semibold p-3 rounded-xl"></div>
+                    <button onclick="nextQuizQuestion()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition">
+                        Lanjut ke Soal Berikutnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Score Screen (Hidden by default) -->
+            <div id="quiz-score-screen" class="hidden glass-card p-8 rounded-2xl text-center space-y-6 border border-indigo-500/30">
+                <div class="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl mx-auto flex items-center justify-center text-3xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-bold text-white">Quiz Selesai! 🎉</h2>
+                    <p class="text-slate-400 text-sm">Kamu telah menyelesaikan seluruh pertanyaan dengan baik.</p>
+                </div>
+                <div class="text-4xl font-extrabold bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent" id="quiz-final-score">
+                    Score: 90 / 100
+                </div>
+                <button onclick="restartQuiz()" class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition">
+                    Ulangi Quiz <i class="fa-solid fa-rotate-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== PROJECTS VIEW ==================== -->
+        <section id="view-projects" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">Mini Projects</h1>
+                <p class="text-slate-400 text-sm mt-1">Kumpulan proyek nyata yang bisa kamu buat sendiri untuk portofolio pemula.</p>
+            </div>
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- ==================== BUTTON GENERATOR VIEW ==================== -->
+        <section id="view-buttongenerator" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">CSS Button Generator</h1>
+                <p class="text-slate-400 text-sm mt-1">Buat desain tombol kustom secara visual dan salin kodenya secara instan.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Controls Column -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl border border-darkborder space-y-5">
+                    <h3 class="text-lg font-bold text-white border-b border-darkborder pb-3">Button Settings</h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Button Text -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Button Text</label>
+                            <input type="text" id="bg-text" value="Button" oninput="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <!-- Style Variant -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Button Style</label>
+                            <select id="bg-style" onchange="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="solid">Solid (Standar)</option>
+                                <option value="outline">Outline (Garis Tepi)</option>
+                                <option value="gradient">Gradient (Gradasi)</option>
+                                <option value="ghost">Ghost (Transparan)</option>
+                            </select>
+                        </div>
+
+                        <!-- Background Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Background Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="bg-color" value="#6366f1" oninput="updateButtonGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="bg-color-val" class="text-xs font-mono text-slate-300">#6366f1</span>
+                            </div>
+                        </div>
+
+                        <!-- Hover Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Hover Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="bg-hover-color" value="#4f46e5" oninput="updateButtonGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="bg-hover-val" class="text-xs font-mono text-slate-300">#4f46e5</span>
+                            </div>
+                        </div>
+
+                        <!-- Text Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="text-color" value="#ffffff" oninput="updateButtonGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="text-color-val" class="text-xs font-mono text-slate-300">#ffffff</span>
+                            </div>
+                        </div>
+
+                        <!-- Font Size -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Size (px)</label>
+                            <input type="number" id="font-size" value="14" min="10" max="24" oninput="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Font Weight -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Weight</label>
+                            <select id="font-weight" onchange="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="400">Normal (400)</option>
+                                <option value="500" selected>Medium (500)</option>
+                                <option value="700">Bold (700)</option>
+                            </select>
+                        </div>
+
+                        <!-- Border Radius -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Border Radius (px)</label>
+                            <input type="number" id="border-radius" value="8" min="0" max="50" oninput="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Padding Y -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Padding Y (px)</label>
+                            <input type="number" id="padding-y" value="12" min="4" max="30" oninput="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Padding X -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Padding X (px)</label>
+                            <input type="number" id="padding-x" value="24" min="8" max="50" oninput="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Border Width -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Border Width (px)</label>
+                            <input type="number" id="border-width" value="0" min="0" max="10" oninput="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Border Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Border Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="border-color" value="#ffffff" oninput="updateButtonGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="border-color-val" class="text-xs font-mono text-slate-300">#ffffff</span>
+                            </div>
+                        </div>
+
+                        <!-- Box Shadow -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Box Shadow</label>
+                            <select id="box-shadow" onchange="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="none">None (Tanpa Bayangan)</option>
+                                <option value="0 4px 6px -1px rgba(0, 0, 0, 0.1)">Soft Shadow</option>
+                                <option value="0 10px 15px -3px rgba(99, 102, 241, 0.3)" selected>Glow / Indigo Shadow</option>
+                                <option value="0 20px 25px -5px rgba(0, 0, 0, 0.3)">Deep Shadow</option>
+                            </select>
+                        </div>
+
+                        <!-- Width & Height -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Width</label>
+                            <select id="btn-width" onchange="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="auto">Auto (Responsive)</option>
+                                <option value="100%">Full Width (100%)</option>
+                                <option value="200px">Fixed (200px)</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cursor</label>
+                            <select id="btn-cursor" onchange="updateButtonGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="pointer">Pointer</option>
+                                <option value="default">Default</option>
+                                <option value="wait">Wait</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview & Code Output Column -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Live Preview Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-darkborder space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Preview</span>
+                        <div class="bg-slate-950/80 rounded-xl h-36 flex items-center justify-center border border-darkborder p-4 overflow-hidden">
+                            <!-- Dynamic Button Preview -->
+                            <div id="btn-preview-container">
+                                <button id="preview-button" class="transition-all duration-200">Button</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Output Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-darkborder space-y-4">
+                        <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Generated Code</span>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="copyGeneratorCode('html')" class="px-2.5 py-1 rounded-lg bg-darkcard border border-darkborder hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">Copy HTML</button>
+                                <button onclick="copyGeneratorCode('css')" class="px-2.5 py-1 rounded-lg bg-darkcard border border-darkborder hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">Copy CSS</button>
+                                <button onclick="copyGeneratorCode('all')" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-600/30">Copy All</button>
+                            </div>
+                        </div>
+
+                        <!-- HTML Code Box -->
+                        <div class="space-y-1">
+                            <span class="text-[11px] text-slate-400 font-mono">HTML</span>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-indigo-300 overflow-x-auto">
+                                <pre id="code-output-html">&lt;button class="my-button"&gt;Button&lt;/button&gt;</pre>
+                            </div>
+                        </div>
+
+                        <!-- CSS Code Box -->
+                        <div class="space-y-1">
+                            <span class="text-[11px] text-slate-400 font-mono">CSS</span>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-emerald-300 overflow-x-auto max-h-48">
+                                <pre id="code-output-css">.my-button {\n  /* CSS generated here */\n}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CARD GENERATOR VIEW ==================== -->
+        <section id="view-cardgenerator" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">CSS Card Generator</h1>
+                <p class="text-slate-400 text-sm mt-1">Buat desain Card/Kartu Website secara visual dan dapatkan kodenya secara instan.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Controls Column -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl border border-darkborder space-y-5">
+                    <h3 class="text-lg font-bold text-white border-b border-darkborder pb-3">Card Settings</h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Card Style Variant -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Card Style</label>
+                            <select id="cg-style" onchange="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="simple">Simple</option>
+                                <option value="modern" selected>Modern</option>
+                                <option value="glass">Glass (Glassmorphism)</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="gradient">Gradient</option>
+                            </select>
+                        </div>
+
+                        <!-- Card Title -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Judul Card</label>
+                            <input type="text" id="cg-title" value="Card Title" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <!-- Card Description -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Deskripsi</label>
+                            <textarea id="cg-desc" rows="2" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 resize-none">Card description goes here. Build awesome components visually with CodePlay.</textarea>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Upload Gambar</label>
+                            <input type="file" id="cg-image-file" accept="image/*" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3 py-2 text-xs text-slate-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+                        </div>
+
+                        <!-- Image Height -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Image Height (px)</label>
+                            <input type="number" id="cg-img-height" value="180" min="80" max="350" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Card Width -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Card Width</label>
+                            <select id="cg-width" onchange="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="320px">Fixed (320px)</option>
+                                <option value="360px" selected>Medium (360px)</option>
+                                <option value="100%">Full Width (100%)</option>
+                            </select>
+                        </div>
+
+                        <!-- Show Button Toggle -->
+                        <div class="space-y-1.5 sm:col-span-2 flex items-center justify-between bg-slate-950 px-4 py-3 rounded-xl border border-darkborder">
+                            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Tampilkan Tombol</label>
+                            <input type="checkbox" id="cg-show-btn" checked onchange="updateCardGenerator()" class="w-4 h-4 accent-indigo-600 cursor-pointer">
+                        </div>
+
+                        <!-- Button Text -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Teks Tombol</label>
+                            <input type="text" id="cg-btn-text" value="Learn More" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Background Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Background Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="cg-bg-color" value="#131c31" oninput="updateCardGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="cg-bg-val" class="text-xs font-mono text-slate-300">#131c31</span>
+                            </div>
+                        </div>
+
+                        <!-- Text Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="cg-text-color" value="#ffffff" oninput="updateCardGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="cg-text-val" class="text-xs font-mono text-slate-300">#ffffff</span>
+                            </div>
+                        </div>
+
+                        <!-- Button Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Button Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="cg-btn-color" value="#6366f1" oninput="updateCardGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="cg-btn-val" class="text-xs font-mono text-slate-300">#6366f1</span>
+                            </div>
+                        </div>
+
+                        <!-- Font Size -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Size (px)</label>
+                            <input type="number" id="cg-font-size" value="14" min="10" max="22" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Padding -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Padding (px)</label>
+                            <input type="number" id="cg-padding" value="20" min="10" max="40" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Border Radius -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Border Radius (px)</label>
+                            <input type="number" id="cg-border-radius" value="16" min="0" max="40" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Border Width -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Border Width (px)</label>
+                            <input type="number" id="cg-border-width" value="1" min="0" max="10" oninput="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Border Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Border Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="cg-border-color" value="#1e293b" oninput="updateCardGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="cg-border-val" class="text-xs font-mono text-slate-300">#1e293b</span>
+                            </div>
+                        </div>
+
+                        <!-- Box Shadow -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Box Shadow</label>
+                            <select id="cg-box-shadow" onchange="updateCardGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="none">None (Tanpa Bayangan)</option>
+                                <option value="0 4px 6px -1px rgba(0, 0, 0, 0.1)">Soft Shadow</option>
+                                <option value="0 10px 25px -5px rgba(0, 0, 0, 0.3)" selected>Modern Shadow</option>
+                                <option value="0 20px 25px -5px rgba(99, 102, 241, 0.2)">Glow Shadow</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview & Code Output Column -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Live Preview Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-darkborder space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Preview</span>
+                        <div class="bg-slate-950/80 rounded-xl min-h-[320px] flex items-center justify-center border border-darkborder p-6 overflow-hidden">
+                            <!-- Dynamic Card Preview Container -->
+                            <div id="card-preview-wrapper" class="flex justify-center w-full">
+                                <div id="preview-card" class="overflow-hidden transition-all duration-200 flex flex-col">
+                                    <div id="preview-card-img-container" class="w-full overflow-hidden bg-slate-800">
+                                        <img id="preview-card-img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Card preview image" class="w-full h-full object-cover">
+                                    </div>
+                                    <div id="preview-card-body" class="flex flex-col flex-grow justify-between">
+                                        <div class="space-y-2">
+                                            <h3 id="preview-card-title" class="font-bold text-lg leading-snug">Card Title</h3>
+                                            <p id="preview-card-desc" class="text-slate-300 text-sm leading-relaxed">Card description goes here. Build awesome components visually with CodePlay.</p>
+                                        </div>
+                                        <div id="preview-card-btn-container" class="pt-4 mt-auto">
+                                            <button id="preview-card-btn" class="w-full py-2.5 px-4 rounded-xl font-semibold text-white transition-all text-center">Learn More</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Output Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-darkborder space-y-4">
+                        <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Generated Code</span>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="copyCardCode('html')" class="px-2.5 py-1 rounded-lg bg-darkcard border border-darkborder hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">Copy HTML</button>
+                                <button onclick="copyCardCode('css')" class="px-2.5 py-1 rounded-lg bg-darkcard border border-darkborder hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">Copy CSS</button>
+                                <button onclick="copyCardCode('all')" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-600/30">Copy All Code</button>
+                            </div>
+                        </div>
+
+                        <!-- HTML Code Box -->
+                        <div class="space-y-1">
+                            <span class="text-[11px] text-slate-400 font-mono">HTML</span>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-indigo-300 overflow-x-auto max-h-40">
+                                <pre id="card-code-output-html">&lt;div class="card"&gt;\n  ...\n&lt;/div&gt;</pre>
+                            </div>
+                        </div>
+
+                        <!-- CSS Code Box -->
+                        <div class="space-y-1">
+                            <span class="text-[11px] text-slate-400 font-mono">CSS</span>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-emerald-300 overflow-x-auto max-h-48">
+                                <pre id="card-code-output-css">.card {\n  ...\n}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TEXT STYLE GENERATOR VIEW ==================== -->
+        <section id="view-textgenerator" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4 flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">Text Style Generator</h1>
+                    <p class="text-slate-400 text-sm mt-1">Buat dan atur desain tipografi teks website secara visual dengan mudah.</p>
+                </div>
+                <button onclick="resetTextStyleGenerator()" class="px-4 py-2 rounded-xl bg-darkcard border border-darkborder text-amber-400 hover:bg-slate-800 text-xs font-semibold flex items-center shadow transition">
+                    <i class="fa-solid fa-rotate-right mr-1.5"></i> Reset
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Controls Column -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl border border-darkborder space-y-5">
+                    <h3 class="text-lg font-bold text-white border-b border-darkborder pb-3">Text Settings</h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Text Content -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Content</label>
+                            <input type="text" id="ts-text" value="Belajar Coding Jadi Lebih Mudah" oninput="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <!-- Font Family -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Family</label>
+                            <select id="ts-font" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="Helvetica, sans-serif">Helvetica</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="Times New Roman, serif">Times New Roman</option>
+                                <option value="Courier New, monospace">Courier New</option>
+                                <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                                <option value="'Poppins', sans-serif" selected>Poppins</option>
+                                <option value="'Roboto', sans-serif">Roboto</option>
+                                <option value="'Montserrat', sans-serif">Montserrat</option>
+                                <option value="'Open Sans', sans-serif">Open Sans</option>
+                                <option value="'Nunito', sans-serif">Nunito</option>
+                                <option value="'Inter', sans-serif">Inter</option>
+                                <option value="'Oswald', sans-serif">Oswald</option>
+                                <option value="'Playfair Display', serif">Playfair Display</option>
+                            </select>
+                        </div>
+
+                        <!-- Font Size -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Size (px)</label>
+                            <input type="number" id="ts-size" value="32" min="12" max="96" oninput="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Font Weight -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Weight</label>
+                            <select id="ts-weight" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="300">Light (300)</option>
+                                <option value="400">Normal (400)</option>
+                                <option value="500">Medium (500)</option>
+                                <option value="600">Semibold (600)</option>
+                                <option value="700" selected>Bold (700)</option>
+                                <option value="800">Extra Bold (800)</option>
+                            </select>
+                        </div>
+
+                        <!-- Text Color -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Color</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="ts-color" value="#ffffff" oninput="updateTextStyleGenerator()" class="w-10 h-10 rounded-lg bg-slate-950 border border-darkborder cursor-pointer p-1">
+                                <span id="ts-color-val" class="text-xs font-mono text-slate-300">#ffffff</span>
+                            </div>
+                        </div>
+
+                        <!-- Text Align -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Align</label>
+                            <select id="ts-align" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                                <option value="justify">Justify</option>
+                            </select>
+                        </div>
+
+                        <!-- Letter Spacing -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Letter Spacing (px)</label>
+                            <input type="number" id="ts-spacing" value="1" min="-2" max="20" step="0.5" oninput="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Line Height -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Line Height</label>
+                            <input type="number" id="ts-lineheight" value="1.5" min="0.8" max="3" step="0.1" oninput="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                        </div>
+
+                        <!-- Text Transform -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Transform</label>
+                            <select id="ts-transform" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="none" selected>None</option>
+                                <option value="uppercase">Uppercase</option>
+                                <option value="lowercase">Lowercase</option>
+                                <option value="capitalize">Capitalize</option>
+                            </select>
+                        </div>
+
+                        <!-- Text Decoration -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Decoration</label>
+                            <select id="ts-decoration" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="none" selected>None</option>
+                                <option value="underline">Underline</option>
+                                <option value="line-through">Line-through</option>
+                            </select>
+                        </div>
+
+                        <!-- Font Style -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Font Style</label>
+                            <select id="ts-style" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="normal" selected>Normal</option>
+                                <option value="italic">Italic</option>
+                            </select>
+                        </div>
+
+                        <!-- Text Shadow -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Text Shadow</label>
+                            <select id="ts-shadow" onchange="updateTextStyleGenerator()" class="w-full bg-slate-950 border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none">
+                                <option value="none" selected>None</option>
+                                <option value="0 2px 4px rgba(0, 0, 0, 0.3)">Soft Shadow</option>
+                                <option value="0 0 10px rgba(99, 102, 241, 0.8)">Glow Shadow</option>
+                                <option value="2px 2px 4px rgba(0, 0, 0, 0.6)">Deep Shadow</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview & Code Output Column -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Live Preview Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-darkborder space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Preview</span>
+                        <div class="bg-slate-950/80 rounded-xl min-h-[220px] flex items-center justify-center border border-darkborder p-6 overflow-x-auto">
+                            <!-- Dynamic Text Preview Element -->
+                            <h1 id="preview-text" class="transition-all duration-200">Belajar Coding Jadi Lebih Mudah</h1>
+                        </div>
+                    </div>
+
+                    <!-- Code Output Card -->
+                    <div class="glass-card p-6 rounded-2xl border border-darkborder space-y-4">
+                        <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Generated Code</span>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="copyTextStyleCode('html')" class="px-2.5 py-1 rounded-lg bg-darkcard border border-darkborder hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">Copy HTML</button>
+                                <button onclick="copyTextStyleCode('css')" class="px-2.5 py-1 rounded-lg bg-darkcard border border-darkborder hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">Copy CSS</button>
+                                <button onclick="copyTextStyleCode('all')" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-600/30">Copy All Code</button>
+                            </div>
+                        </div>
+
+                        <!-- HTML Code Box -->
+                        <div class="space-y-1">
+                            <span class="text-[11px] text-slate-400 font-mono">HTML</span>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-indigo-300 overflow-x-auto">
+                                <pre id="ts-code-output-html">&lt;h1 class="my-text"&gt;Belajar Coding Jadi Lebih Mudah&lt;/h1&gt;</pre>
+                            </div>
+                        </div>
+
+                        <!-- CSS Code Box -->
+                        <div class="space-y-1">
+                            <span class="text-[11px] text-slate-400 font-mono">CSS</span>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-emerald-300 overflow-x-auto max-h-48">
+                                <pre id="ts-code-output-css">.my-text {\n  ...\n}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== COLOR PICKER VIEW ==================== -->
+        <section id="view-colorpicker" class="view-section hidden animate-fade-in space-y-8 max-w-4xl mx-auto">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">CSS Color Picker & Generator</h1>
+                <p class="text-slate-400 text-sm mt-1">Pilih warna interaktif dan salin kodenya dalam format HEX, RGB, atau HSL untuk proyek CSS kamu.</p>
+            </div>
+
+            <!-- Color Picker Card Container -->
+            <div class="glass-card p-6 sm:p-8 rounded-2xl border border-darkborder grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- Preview & Input Column -->
+                <div class="space-y-6 text-center">
+                    <div id="color-preview-box" class="w-full h-48 rounded-2xl shadow-inner border border-white/10 transition-colors duration-200" style="background-color: #6366f1;"></div>
+                    <div class="flex flex-col items-center space-y-2">
+                        <label for="color-picker-input" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pilih Warna Interaktif</label>
+                        <input type="color" id="color-picker-input" value="#6366f1" class="w-full h-12 bg-darkcard border border-darkborder rounded-xl cursor-pointer p-1">
+                    </div>
+                </div>
+
+                <!-- Code Outputs Column -->
+                <div class="space-y-4">
+                    <!-- HEX Row -->
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">HEX Code</span>
+                        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 rounded-xl border border-darkborder font-mono text-sm text-slate-200">
+                            <span id="code-hex">#6366f1</span>
+                            <button onclick="copyColorCode('hex')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center shadow-lg shadow-indigo-600/30">
+                                <i class="fa-regular fa-copy mr-1.5"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RGB Row -->
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">RGB Code</span>
+                        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 rounded-xl border border-darkborder font-mono text-sm text-slate-200">
+                            <span id="code-rgb">rgb(99, 102, 241)</span>
+                            <button onclick="copyColorCode('rgb')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center shadow-lg shadow-indigo-600/30">
+                                <i class="fa-regular fa-copy mr-1.5"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- HSL Row -->
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">HSL Code</span>
+                        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 rounded-xl border border-darkborder font-mono text-sm text-slate-200">
+                            <span id="code-hsl">hsl(239, 84%, 67%)</span>
+                            <button onclick="copyColorCode('hsl')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center shadow-lg shadow-indigo-600/30">
+                                <i class="fa-regular fa-copy mr-1.5"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CHEAT SHEET VIEW ==================== -->
+        <section id="view-cheatsheet" class="view-section hidden animate-fade-in space-y-8">
+            <div class="border-b border-darkborder pb-4">
+                <h1 class="text-3xl font-extrabold tracking-tight">Code Cheat Sheet</h1>
+                <p class="text-slate-400 text-sm mt-1">Referensi cepat tag HTML, properti CSS, dan metode JavaScript.</p>
+            </div>
+
+            <!-- Cheat Sheet Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-darkborder pb-4">
+                <button onclick="filterCheatSheet('html')" id="cs-tab-html" class="cs-tab px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition">HTML Tags</button>
+                <button onclick="filterCheatSheet('css')" id="cs-tab-css" class="cs-tab px-4 py-2 rounded-xl text-xs font-bold bg-darkcard text-slate-300 hover:bg-slate-800 transition">CSS Properties</button>
+                <button onclick="filterCheatSheet('js')" id="cs-tab-js" class="cs-tab px-4 py-2 rounded-xl text-xs font-bold bg-darkcard text-slate-300 hover:bg-slate-800 transition">JS Methods</button>
+                <button onclick="filterCheatSheet('syntax')" id="cs-tab-syntax" class="cs-tab px-4 py-2 rounded-xl text-xs font-bold bg-darkcard text-slate-300 hover:bg-slate-800 transition">JS Syntax</button>
+            </div>
+
+            <!-- Cheat Sheet Grid -->
+            <div id="cheatsheet-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer" class="glass-card border-t border-darkborder mt-20 py-8 text-center text-slate-500 text-xs space-y-2 hidden">
+        <div class="flex items-center justify-center space-x-2">
+            <div class="w-6 h-6 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs">
+                <i class="fa-solid fa-code"></i>
+            </div>
+            <span class="font-bold text-slate-300">CodePlay</span>
+        </div>
+        <p>Platform belajar coding interaktif modern untuk pelajar & pemula. Dibuat dengan HTML, CSS, dan JavaScript.</p>
+        <p>&copy; 2026 CodePlay. All rights reserved.</p>
+    </footer>
+
+    <!-- Dynamic Style Tags -->
+    <style id="dynamic-btn-generator-style"></style>
+    <style id="dynamic-card-generator-style"></style>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- Bulletproof Clipboard Helper ---
+        function copyToClipboard(text, successMsg = 'Code copied!') {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(successMsg, 'success');
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(text, successMsg);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text, successMsg);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(successMsg, 'success');
+                } else {
+                    showToast('Gagal menyalin teks', 'error');
+                }
+            } catch (err) {
+                showToast('Gagal menyalin teks', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // --- Welcome Screen Transition ---
+        function enterCodePlay() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            welcomeScreen.classList.add('opacity-0', 'scale-105', 'transition-all', 'duration-500');
+            setTimeout(() => {
+                welcomeScreen.remove();
+                document.getElementById('main-header').classList.remove('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('main-footer').classList.remove('hidden');
+                switchView('home');
+            }, 400);
+        }
+
+        // --- State & Storage Management ---
+        let userProgress = JSON.parse(localStorage.getItem('codeplay_progress')) || {
+            html: 40,
+            css: 20,
+            js: 10
+        };
+
+        function saveProgress() {
+            localStorage.setItem('codeplay_progress', JSON.stringify(userProgress));
+            updateProgressUI();
+        }
+
+        function updateProgressUI() {
+            document.getElementById('home-html-prog').innerText = userProgress.html + '%';
+            document.getElementById('home-html-bar').style.width = userProgress.html + '%';
+            document.getElementById('home-css-prog').innerText = userProgress.css + '%';
+            document.getElementById('home-css-bar').style.width = userProgress.css + '%';
+            document.getElementById('home-js-prog').innerText = userProgress.js + '%';
+            document.getElementById('home-js-bar').style.width = userProgress.js + '%';
+            
+            const avg = Math.round((userProgress.html + userProgress.css + userProgress.js) / 3);
+            document.getElementById('global-progress-text').innerText = 'Progress: ' + avg + '%';
+        }
+
+        // --- View Router ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-target') === viewId) {
+                    btn.classList.add('bg-indigo-600/20', 'text-indigo-400');
+                } else {
+                    btn.classList.remove('bg-indigo-600/20', 'text-indigo-400');
+                }
+            });
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        function toggleMobileMenu() {
+            mobileMenu.classList.add('hidden');
+        }
+
+        // Toast Notification Function
+        function showToast(msg = 'Code copied!', type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMsg.innerText = msg;
+            if(type === 'success') {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-amber-400 text-lg';
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2500);
+        }
+
+        // --- Button Generator Logic ---
+        function updateButtonGenerator() {
+            const text = document.getElementById('bg-text').value || 'Button';
+            const style = document.getElementById('bg-style').value;
+            const bgColor = document.getElementById('bg-color').value;
+            const hoverColor = document.getElementById('bg-hover-color').value;
+            const textColor = document.getElementById('text-color').value;
+            const fontSize = document.getElementById('font-size').value + 'px';
+            const fontWeight = document.getElementById('font-weight').value;
+            const borderRadius = document.getElementById('border-radius').value + 'px';
+            const paddingY = document.getElementById('padding-y').value + 'px';
+            const paddingX = document.getElementById('padding-x').value + 'px';
+            const borderWidth = document.getElementById('border-width').value + 'px';
+            const borderColor = document.getElementById('border-color').value;
+            const boxShadow = document.getElementById('box-shadow').value;
+            const width = document.getElementById('btn-width').value;
+            const cursor = document.getElementById('btn-cursor').value;
+
+            document.getElementById('bg-color-val').innerText = bgColor;
+            document.getElementById('bg-hover-val').innerText = hoverColor;
+            document.getElementById('text-color-val').innerText = textColor;
+            document.getElementById('border-color-val').innerText = borderColor;
+
+            const btnEl = document.getElementById('preview-button');
+            btnEl.innerText = text;
+
+            let cssBackground = `background-color: ${bgColor};`;
+            let cssColor = `color: ${textColor};`;
+            let cssBorder = `border: ${borderWidth} solid ${borderColor};`;
+            let cssHoverBg = `background-color: ${hoverColor};`;
+            let cssHoverColor = `color: ${textColor};`;
+
+            if (style === 'outline') {
+                cssBackground = `background-color: transparent;`;
+                cssColor = `color: ${bgColor};`;
+                cssBorder = `border: ${borderWidth && borderWidth !== '0px' ? borderWidth : '2px'} solid ${bgColor};`;
+                cssHoverBg = `background-color: ${bgColor};`;
+                cssHoverColor = `color: ${textColor};`;
+            } else if (style === 'gradient') {
+                cssBackground = `background: linear-gradient(135deg, ${bgColor}, ${hoverColor});`;
+                cssColor = `color: ${textColor};`;
+                cssBorder = `border: ${borderWidth} solid ${borderColor};`;
+                cssHoverBg = `background: linear-gradient(135deg, ${hoverColor}, ${bgColor});`;
+                cssHoverColor = `color: ${textColor};`;
+            } else if (style === 'ghost') {
+                cssBackground = `background-color: transparent;`;
+                cssColor = `color: ${bgColor};`;
+                cssBorder = `border: none;`;
+                cssHoverBg = `background-color: ${bgColor}20;`;
+                cssHoverColor = `color: ${bgColor};`;
+            }
+
+            btnEl.style.cssText = `
+                ${cssBackground}
+                ${cssColor}
+                ${cssBorder}
+                font-size: ${fontSize};
+                font-weight: ${fontWeight};
+                border-radius: ${borderRadius};
+                padding: ${paddingY} ${paddingX};
+                box-shadow: ${boxShadow !== 'none' ? boxShadow : 'none'};
+                width: ${width};
+                cursor: ${cursor};
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                transition: all 0.2s ease-in-out;
+            `;
+
+            const dynamicStyleEl = document.getElementById('dynamic-btn-generator-style');
+            dynamicStyleEl.innerHTML = `
+                #preview-button:hover {
+                    ${cssHoverBg}
+                    ${cssHoverColor}
+                    transform: translateY(-1px);
+                }
+            `;
+
+            const htmlCode = `<button class="my-button">${text}</button>`;
+            const cssCode = `.my-button {\n  ${cssBackground}\n  ${cssColor}\n  ${cssBorder}\n  font-size: ${fontSize};\n  font-weight: ${fontWeight};\n  border-radius: ${borderRadius};\n  padding: ${paddingY} ${paddingX};\n  box-shadow: ${boxShadow !== 'none' ? boxShadow : 'none'};\n  width: ${width};\n  cursor: ${cursor};\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s ease-in-out;\n}\n\n.my-button:hover {\n  ${cssHoverBg}\n  ${cssHoverColor}\n  transform: translateY(-1px);\n}`;
+
+            document.getElementById('code-output-html').innerText = htmlCode;
+            document.getElementById('code-output-css').innerText = cssCode;
+        }
+
+        function copyGeneratorCode(type) {
+            let textToCopy = '';
+            if (type === 'html') {
+                textToCopy = document.getElementById('code-output-html').innerText;
+            } else if (type === 'css') {
+                textToCopy = document.getElementById('code-output-css').innerText;
+            } else if (type === 'all') {
+                const html = document.getElementById('code-output-html').innerText;
+                const css = document.getElementById('code-output-css').innerText;
+                textToCopy = `${html}\n\n<style>\n${css}\n</style>`;
+            }
+            copyToClipboard(textToCopy, 'Code copied!');
+        }
+
+        // --- Card Generator Logic ---
+        let uploadedCardImageUrl = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80';
+
+        document.getElementById('cg-image-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedCardImageUrl = event.target.result;
+                    updateCardGenerator();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updateCardGenerator() {
+            const style = document.getElementById('cg-style').value;
+            const title = document.getElementById('cg-title').value || 'Card Title';
+            const desc = document.getElementById('cg-desc').value || '';
+            const imgHeight = document.getElementById('cg-img-height').value + 'px';
+            const cardWidth = document.getElementById('cg-width').value;
+            const showBtn = document.getElementById('cg-show-btn').checked;
+            const btnText = document.getElementById('cg-btn-text').value || 'Learn More';
+            const bgColor = document.getElementById('cg-bg-color').value;
+            const textColor = document.getElementById('cg-text-color').value;
+            const btnColor = document.getElementById('cg-btn-color').value;
+            const fontSize = document.getElementById('cg-font-size').value + 'px';
+            const padding = document.getElementById('cg-padding').value + 'px';
+            const borderRadius = document.getElementById('cg-border-radius').value + 'px';
+            const borderWidth = document.getElementById('cg-border-width').value + 'px';
+            const borderColor = document.getElementById('cg-border-color').value;
+            const boxShadow = document.getElementById('cg-box-shadow').value;
+
+            document.getElementById('cg-bg-val').innerText = bgColor;
+            document.getElementById('cg-text-val').innerText = textColor;
+            document.getElementById('cg-btn-val').innerText = btnColor;
+            document.getElementById('cg-border-val').innerText = borderColor;
+
+            const cardEl = document.getElementById('preview-card');
+            const imgContainer = document.getElementById('preview-card-img-container');
+            const imgEl = document.getElementById('preview-card-img');
+            const titleEl = document.getElementById('preview-card-title');
+            const descEl = document.getElementById('preview-card-desc');
+            const btnContainer = document.getElementById('preview-card-btn-container');
+            const btnEl = document.getElementById('preview-card-btn');
+
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+            btnEl.innerText = btnText;
+            imgEl.src = uploadedCardImageUrl;
+            imgContainer.style.height = imgHeight;
+
+            if (showBtn) {
+                btnContainer.style.display = 'block';
+            } else {
+                btnContainer.style.display = 'none';
+            }
+
+            let cardBgCss = `background-color: ${bgColor};`;
+            let cardBorderCss = `border: ${borderWidth} solid ${borderColor};`;
+            let cardShadowCss = `box-shadow: ${boxShadow !== 'none' ? boxShadow : 'none'};`;
+            let cardBackdropCss = '';
+
+            if (style === 'glass') {
+                cardBgCss = `background-color: ${bgColor}bb;`;
+                cardBackdropCss = `backdrop-filter: blur(12px);`;
+                cardBorderCss = `border: ${borderWidth} solid rgba(255, 255, 255, 0.15);`;
+            } else if (style === 'minimal') {
+                cardBorderCss = `border: none;`;
+                cardShadowCss = `box-shadow: none;`;
+            } else if (style === 'gradient') {
+                cardBgCss = `background: linear-gradient(135deg, ${bgColor}, #1e293b);`;
+            }
+
+            cardEl.style.cssText = `
+                width: ${cardWidth};
+                ${cardBgCss}
+                ${cardBackdropCss}
+                color: ${textColor};
+                border-radius: ${borderRadius};
+                ${cardBorderCss}
+                ${cardShadowCss}
+                padding: ${padding};
+                font-size: ${fontSize};
+                overflow: hidden;
+            `;
+
+            titleEl.style.color = textColor;
+            descEl.style.color = textColor;
+            descEl.style.opacity = '0.85';
+
+            btnEl.style.cssText = `
+                background-color: ${btnColor};
+                color: #ffffff;
+                border-radius: calc(${borderRadius} - 4px);
+                padding: 10px 16px;
+                font-size: ${fontSize};
+                font-weight: 600;
+                width: 100%;
+                display: inline-block;
+                text-align: center;
+                transition: opacity 0.2s;
+            `;
+
+            const htmlCode = `<div class="card">\n  <div class="card-img-wrapper">\n    <img src="image.jpg" alt="Card Image">\n  </div>\n  <div class="card-body">\n    <h3 class="card-title">${title}</h3>\n    <p class="card-desc">${desc}</p>\n    ${showBtn ? `<div class="card-footer">\n      <button class="card-btn">${btnText}</button>\n    </div>` : ''}\n  </div>\n</div>`;
+
+            const cssCode = `.card {\n  width: ${cardWidth};\n  ${cardBgCss}\n  ${cardBackdropCss}\n  color: ${textColor};\n  border-radius: ${borderRadius};\n  ${cardBorderCss}\n  ${cardShadowCss}\n  padding: ${padding};\n  font-size: ${fontSize};\n  overflow: hidden;\n  transition: transform 0.2s ease-in-out;\n}\n\n.card:hover {\n  transform: translateY(-3px);\n}\n\n.card-img-wrapper {\n  width: 100%;\n  height: ${imgHeight};\n  overflow: hidden;\n  border-radius: calc(${borderRadius} - ${padding});\n  margin-bottom: 12px;\n}\n\n.card-img-wrapper img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.card-title {\n  font-size: 1.25rem;\n  font-weight: 700;\n  margin-bottom: 8px;\n  color: ${textColor};\n}\n\n.card-desc {\n  color: ${textColor};\n  opacity: 0.85;\n  font-size: 0.9rem;\n  line-height: 1.5;\n  margin-bottom: 16px;\n}\n\n.card-btn {\n  background-color: ${btnColor};\n  color: #ffffff;\n  border: none;\n  border-radius: 8px;\n  padding: 10px 16px;\n  font-weight: 600;\n  width: 100%;\n  cursor: pointer;\n  transition: opacity 0.2s;\n}\n\n.card-btn:hover {\n  opacity: 0.9;\n}`;
+
+            document.getElementById('card-code-output-html').innerText = htmlCode;
+            document.getElementById('card-code-output-css').innerText = cssCode;
+        }
+
+        function copyCardCode(type) {
+            let textToCopy = '';
+            if (type === 'html') {
+                textToCopy = document.getElementById('card-code-output-html').innerText;
+            } else if (type === 'css') {
+                textToCopy = document.getElementById('card-code-output-css').innerText;
+            } else if (type === 'all') {
+                const html = document.getElementById('card-code-output-html').innerText;
+                const css = document.getElementById('card-code-output-css').innerText;
+                textToCopy = `${html}\n\n<style>\n${css}\n</style>`;
+            }
+            copyToClipboard(textToCopy, 'Code copied!');
+        }
+
+        // --- Text Style Generator Logic ---
+        function updateTextStyleGenerator() {
+            const text = document.getElementById('ts-text').value || 'Belajar Coding Jadi Lebih Mudah';
+            const font = document.getElementById('ts-font').value;
+            const size = document.getElementById('ts-size').value + 'px';
+            const weight = document.getElementById('ts-weight').value;
+            const color = document.getElementById('ts-color').value;
+            const align = document.getElementById('ts-align').value;
+            const spacing = document.getElementById('ts-spacing').value + 'px';
+            const lineHeight = document.getElementById('ts-lineheight').value;
+            const transform = document.getElementById('ts-transform').value;
+            const decoration = document.getElementById('ts-decoration').value;
+            const style = document.getElementById('ts-style').value;
+            const shadow = document.getElementById('ts-shadow').value;
+
+            document.getElementById('ts-color-val').innerText = color;
+
+            const previewEl = document.getElementById('preview-text');
+            previewEl.innerText = text;
+
+            previewEl.style.cssText = `
+                font-family: ${font};
+                font-size: ${size};
+                font-weight: ${weight};
+                color: ${color};
+                text-align: ${align};
+                letter-spacing: ${spacing};
+                line-height: ${lineHeight};
+                text-transform: ${transform};
+                text-decoration: ${decoration};
+                font-style: ${style};
+                text-shadow: ${shadow !== 'none' ? shadow : 'none'};
+                width: 100%;
+            `;
+
+            const htmlCode = `<h1 class="my-text">${text}</h1>`;
+            const cssCode = `.my-text {\n  font-family: ${font};\n  font-size: ${size};\n  font-weight: ${weight};\n  color: ${color};\n  text-align: ${align};\n  letter-spacing: ${spacing};\n  line-height: ${lineHeight};\n  text-transform: ${transform};\n  text-decoration: ${decoration};\n  font-style: ${style};\n  text-shadow: ${shadow !== 'none' ? shadow : 'none'};\n}`;
+
+            document.getElementById('ts-code-output-html').innerText = htmlCode;
+            document.getElementById('ts-code-output-css').innerText = cssCode;
+        }
+
+        function resetTextStyleGenerator() {
+            document.getElementById('ts-text').value = 'Belajar Coding Jadi Lebih Mudah';
+            document.getElementById('ts-font').value = "'Poppins', sans-serif";
+            document.getElementById('ts-size').value = '32';
+            document.getElementById('ts-weight').value = '700';
+            document.getElementById('ts-color').value = '#ffffff';
+            document.getElementById('ts-align').value = 'center';
+            document.getElementById('ts-spacing').value = '1';
+            document.getElementById('ts-lineheight').value = '1.5';
+            document.getElementById('ts-transform').value = 'none';
+            document.getElementById('ts-decoration').value = 'none';
+            document.getElementById('ts-style').value = 'normal';
+            document.getElementById('ts-shadow').value = 'none';
+            updateTextStyleGenerator();
+            showToast('Settings reset to default!', 'success');
+        }
+
+        function copyTextStyleCode(type) {
+            let textToCopy = '';
+            if (type === 'html') {
+                textToCopy = document.getElementById('ts-code-output-html').innerText;
+            } else if (type === 'css') {
+                textToCopy = document.getElementById('ts-code-output-css').innerText;
+            } else if (type === 'all') {
+                const html = document.getElementById('ts-code-output-html').innerText;
+                const css = document.getElementById('ts-code-output-css').innerText;
+                textToCopy = `${html}\n\n<style>\n${css}\n</style>`;
+            }
+            copyToClipboard(textToCopy, 'Code copied!');
+        }
+
+        // --- Learn & Lesson Data ---
+        const lessonsData = {
+            html: [
+                { title: "1. Pengenalan HTML & Tag Dasar", desc: "HTML (HyperText Markup Language) adalah bahasa markup standar untuk membuat halaman web. Pelajari struktur dasar seperti tag pembuka dan penutup.", code: "<!DOCTYPE html>\n<html>\n<head>\n  <title>Belajar HTML</title>\n</head>\n<body>\n  <h1>Halo, CodePlay!</h1>\n  <p>Ini adalah paragraf pertama saya.</p>\n</body>\n</html>" },
+                { title: "2. Heading & Paragraf", desc: "Heading digunakan untuk membuat judul (<h1> sampai <h6>) dan tag <p> untuk paragraf teks biasa.", code: "<h1>Judul Utama Halaman</h1>\n<h2>Sub-Judul Artikel</h2>\n<p>Paragraf teks biasa yang menjelaskan konten website secara lengkap.</p>" },
+                { title: "3. Membuat Hyperlink & Gambar", desc: "Gunakan tag <a> untuk membuat tautan link ke halaman lain dan tag <img> untuk menampilkan gambar.", code: "<a href='https://google.com' target='_blank'>Kunjungi Google</a>\n<br><br>\n<img src='https://via.placeholder.com/150' alt='Placeholder Image'>" },
+                { title: "4. Membuat Daftar (List)", desc: "Daftar item dapat dibuat menggunakan unordered list (<ul>) dengan item (<li>) atau ordered list (<ol>).", code: "<h3>Daftar Belanja:</h3>\n<ul>\n  <li>HTML Dasar</li>\n  <li>CSS Styling</li>\n  <li>JavaScript Interaktif</li>\n</ul>" },
+                { title: "5. Membuat Form Input Sederhana", desc: "Form digunakan untuk menerima input data dari pengguna seperti nama, email, dan tombol submit.", code: "<form>\n  <label>Nama Kamu:</label><br>\n  <input type='text' placeholder='Ketik nama...'>\n  <button type='submit'>Kirim</button>\n</form>" }
+            ],
+            css: [
+                { title: "1. Pengenalan CSS & Selector", desc: "CSS (Cascading Style Sheets) digunakan untuk mengatur tampilan visual elemen HTML. Pelajari cara memilih elemen dengan selector.", code: "<style>\n  h1 { color: #6366f1; font-family: sans-serif; }\n  p { color: #cbd5e1; font-size: 16px; }\n</style>\n<h1>Judul Berwarna Ungu</h1>\n<p>Teks paragraf dengan warna abu-abu terang.</p>" },
+                { title: "2. Styling Warna & Background", desc: "Mengatur warna latar belakang (background-color), gradasi, dan warna teks dengan kode HEX atau RGB.", code: "<style>\n  .box {\n    background: linear-gradient(135deg, #6366f1, #ec4899);\n    color: white;\n    padding: 20px;\n    border-radius: 12px;\n  }\n</style>\n<div class='box'>\n  <h3>Kotak Gradient Modern</h3>\n</div>" },
+                { title: "3. Box Model (Margin & Padding)", desc: "Memahami konsep jarak luar (margin) dan jarak dalam (padding) serta border pada elemen kotak.", code: "<style>\n  .card {\n    background: #131c31;\n    border: 1px solid #334155;\n    padding: 20px;\n    margin: 10px;\n    border-radius: 8px;\n  }\n</style>\n<div class='card'>\n  <p>Elemen dengan padding dan margin rapi.</p>\n</div>" },
+                { title: "4. Flexbox Layout Modern", desc: "Flexbox adalah sistem layout CSS paling populer untuk menyusun elemen secara fleksibel dan sejajar.", code: "<style>\n  .flex-container {\n    display: flex;\n    justify-content: space-around;\n    background: #090d16;\n    padding: 15px;\n  }\n  .item { background: #6366f1; color: white; padding: 10px 20px; border-radius: 6px; }\n</style>\n<div class='flex-container'>\n  <div class='item'>Kotak 1</div>\n  <div class='item'>Kotak 2</div>\n</div>" },
+                { title: "5. CSS Transition & Hover Effect", desc: "Membuat efek animasi halus ketika kursor mouse menyentuh sebuah elemen (hover).", code: "<style>\n  .btn {\n    background: #4f46e5;\n    color: white;\n    padding: 12px 24px;\n    border-radius: 8px;\n    border: none;\n    cursor: pointer;\n    transition: 0.3s;\n  }\n  .btn:hover { background: #6366f1; transform: scale(1.05); }\n</style>\n<button class='btn'>Hover Me!</button>" }
+            ],
+            javascript: [
+                { title: "1. Variabel & Output Konsol", desc: "Menyimpan data menggunakan let, const, dan menampilkan pesan menggunakan console.log atau alert.", code: "<script>\n  let nama = 'CodePlay User';\n  const tahun = 2026;\n  console.log('Halo ' + nama + ', selamat datang di tahun ' + tahun);\n  alert('Selamat datang, ' + nama);\n<\/script>" },
+                { title: "2. Fungsi (Functions)", desc: "Fungsi adalah blok kode yang dapat dipanggil berulang kali untuk melakukan tugas tertentu.", code: "<script>\n  function sapaUser(nama) {\n    return 'Halo ' + nama + '! Tetap semangat belajar.';\n  }\n  document.write('<h3>' + sapaUser('Budi') + '</h3>');\n<\/script>" },
+                { title: "3. DOM Manipulation Dasar", desc: "JavaScript dapat mengubah isi teks atau gaya HTML secara langsung di browser.", code: "<h1 id='judul'>Teks Asli</h1>\n<button onclick='ubahTeks()'>Ubah Teks</button>\n<script>\n  function ubahTeks() {\n    document.getElementById('judul').innerText = 'Teks Berubah karena JavaScript! 🚀';\n  }\n<\/script>" },
+                { title: "4. Conditional Statement (If-Else)", desc: "Membuat keputusan berdasarkan kondisi logika tertentu menggunakan if dan else.", code: "<script>\n  let nilai = 85;\n  if (nilai >= 75) {\n    document.write('<p style=\"color:lime\">Status: Lulus Ujian! 🎉</p>');\n  } else {\n    document.write('<p style=\"color:red\">Status: Coba Lagi.</p>');\n  }\n<\/script>" },
+                { title: "5. Array & Perulangan For", desc: "Menyimpan banyak data dalam satu variabel array dan mengulanginya menggunakan perulangan for.", code: "<script>\n  let bahasa = ['HTML', 'CSS', 'JavaScript', 'Python'];\n  for (let i = 0; i < bahasa.length; i++) {\n    document.write('<li>Melatih: ' + bahasa[i] + '</li>');\n  }\n<\/script>" }
+            ],
+            basics: [
+                { title: "1. Apa itu Pemrograman?", desc: "Pemrograman adalah cara kita berkomunikasi dengan komputer dengan memberikan instruksi langkah demi langkah.", code: "<!-- Pemrograman adalah instruksi logis -->\n<p>Komputer tidak pintar; komputer hanya menjalankan instruksi yang kita berikan dengan sangat cepat dan tepat.</p>" },
+                { title: "2. Compiler vs Interpreter", desc: "Perbedaan cara menerjemahkan kode bahasa pemrograman menjadi bahasa mesin yang dipahami komputer.", code: "<!-- Compiler & Interpreter -->\n<p><b>Compiler:</b> Menerjemahkan seluruh kode sekaligus sebelum dijalankan (contoh: C++).</p>\n<p><b>Interpreter:</b> Menerjemahkan kode baris demi baris secara langsung (contoh: JavaScript).</p>" },
+                { title: "3. Algoritma Sederhana", desc: "Urutan logis langkah-langkah penyelesaian masalah yang sistematis dan terstruktur.", code: "<!-- Contoh Algoritma Membuat Teh -->\n1. Siapkan cangkir dan teh celup\n2. Rebus air hingga mendidih\n3. Tuang air panas ke cangkir\n4. Celupkan teh hingga warna berubah" },
+                { title: "4. Flowchart & Diagram Alir", desc: "Visualisasi alur logika program menggunakan simbol-simbol standar seperti proses, keputusan, dan input/output.", code: "<!-- Simbol Flowchart -->\n- Oval: Mulai / Selesai\n- Persegi Panjang: Proses\n- Belah Ketupat: Keputusan (If / Else)" }
+            ],
+            logic: [
+                { title: "1. Logika Boolean (True / False)", desc: "Nilai kebenaran dasar dalam komputer yang menentukan alur keputusan program.", code: "<script>\n  let isOnline = true;\n  let isAdmin = false;\n  console.log(isOnline && isAdmin); // Hasil: false\n<\/script>" },
+                { title: "2. Percabangan Kondisi Bertingkat", desc: "Menguji beberapa kondisi sekaligus menggunakan if, else if, dan else.", code: "<script>\n  let waktu = 15;\n  if (waktu < 12) {\n    document.write('Selamat Pagi!');\n  } else if (waktu < 18) {\n    document.write('Selamat Siang/Sore!');\n  } else {\n    document.write('Selamat Malam!');\n  }\n<\/script>" },
+                { title: "3. Perulangan While Loop", desc: "Menjalankan blok kode secara berulang selama kondisi tertentu bernilai benar.", code: "<script>\n  let i = 1;\n  while (i <= 3) {\n    document.write('Hitungan ke-' + i + '<br>');\n    i++;\n  }\n<\/script>" },
+                { title: "4. Studi Kasus: Kalkulator Genap/Ganjil", desc: "Menerukan logika pemrograman untuk mendeteksi apakah suatu angka bernilai genap atau ganjil.", code: "<script>\n  let angka = 7;\n  if (angka % 2 === 0) {\n    console.log(angka + ' adalah Genap');\n  } else {\n    console.log(angka + ' adalah Ganjil');\n  }\n<\/script>" }
+            ]
+        };
+
+        let currentCategory = 'html';
+        let currentLessonIndex = 0;
+
+        function openCategory(categoryKey) {
+            currentCategory = categoryKey;
+            currentLessonIndex = 0;
+            loadLessonDetail();
+            switchView('lesson-detail');
+        }
+
+        function loadLessonDetail() {
+            const list = lessonsData[currentCategory];
+            const lesson = list[currentLessonIndex];
+
+            document.getElementById('lesson-category-badge').innerText = currentCategory.toUpperCase() + ' Lesson';
+            document.getElementById('lesson-title').innerText = lesson.title;
+            document.getElementById('lesson-desc').innerText = lesson.desc;
+            document.getElementById('lesson-code-content').innerText = lesson.code;
+
+            const frame = document.getElementById('lesson-preview-frame');
+            frame.srcdoc = lesson.code;
+
+            document.getElementById('prev-lesson-btn').disabled = currentLessonIndex === 0;
+            document.getElementById('prev-lesson-btn').style.opacity = currentLessonIndex === 0 ? '0.5' : '1';
+            
+            const nextBtn = document.getElementById('next-lesson-btn');
+            if (currentLessonIndex === list.length - 1) {
+                nextBtn.innerHTML = 'Selesaikan Kategori <i class="fa-solid fa-check ml-2"></i>';
+            } else {
+                nextBtn.innerHTML = 'Next Lesson <i class="fa-solid fa-arrow-right ml-2"></i>';
+            }
+        }
+
+        function nextLesson() {
+            const list = lessonsData[currentCategory];
+            if (currentLessonIndex < list.length - 1) {
+                currentLessonIndex++;
+                loadLessonDetail();
+            } else {
+                if (currentCategory === 'html' && userProgress.html < 100) userProgress.html = Math.min(100, userProgress.html + 20);
+                if (currentCategory === 'css' && userProgress.css < 100) userProgress.css = Math.min(100, userProgress.css + 20);
+                if (currentCategory === 'javascript' && userProgress.js < 100) userProgress.js = Math.min(100, userProgress.js + 20);
+                saveProgress();
+                showToast('Kategori selesai! Progress diperbarui.', 'success');
+                switchView('learn');
+            }
+        }
+
+        function prevLesson() {
+            if (currentLessonIndex > 0) {
+                currentLessonIndex--;
+                loadLessonDetail();
+            }
+        }
+
+        function copyLessonCode() {
+            const code = lessonsData[currentCategory][currentLessonIndex].code;
+            copyToClipboard(code, 'Code copied!');
+        }
+
+        // --- Playground Logic ---
+        function switchEditorTab(tab) {
+            ['html', 'css', 'js'].forEach(t => {
+                document.getElementById('editor-pane-' + t).classList.add('hidden');
+                document.getElementById('tab-btn-' + t).className = 'px-4 py-2 text-xs font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent';
+            });
+            document.getElementById('editor-pane-' + tab).classList.remove('hidden');
+            document.getElementById('tab-btn-' + tab).className = 'px-4 py-2 text-xs font-bold text-indigo-400 border-b-2 border-indigo-500';
+        }
+
+        function runPlayground() {
+            const html = document.getElementById('code-html').value;
+            const css = document.getElementById('code-css').value;
+            const js = document.getElementById('code-js').value;
+
+            const fullCode = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>${css}</style>
+                </head>
+                <body>
+                    ${html}
+                    <script>${js}<\/script>
+                </body>
+                </html>
+            `;
+            const frame = document.getElementById('playground-preview');
+            frame.srcdoc = fullCode;
+            showToast('Kode berhasil dijalankan!', 'success');
+        }
+
+        function resetPlayground() {
+            document.getElementById('code-html').value = '<h1>Hello CodePlay! 🚀</h1>\n<p>Mulai ketik kodemu di sini.</p>\n<button onclick="showAlert()">Klik Saya</button>';
+            document.getElementById('code-css').value = 'body { font-family: sans-serif; background: #f8fafc; padding: 20px; text-align: center; }\nh1 { color: #4f46e5; }\nbutton { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }';
+            document.getElementById('code-js').value = 'function showAlert() {\n  alert("Tombol berhasil diklik dari JavaScript!");\n}';
+            runPlayground();
+        }
+
+        function clearPlayground() {
+            document.getElementById('code-html').value = '';
+            document.getElementById('code-css').value = '';
+            document.getElementById('code-js').value = '';
+            runPlayground();
+        }
+
+        function copyPlaygroundCode() {
+            const combined = `<!-- HTML -->\n${document.getElementById('code-html').value}\n\n/* CSS */\n${document.getElementById('code-css').value}\n\n// JavaScript\n${document.getElementById('code-js').value}`;
+            copyToClipboard(combined, 'Code copied!');
+        }
+
+        function toggleFullscreenPreview() {
+            const container = document.getElementById('preview-container');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // --- Color Picker Logic ---
+        function hexToRgb(hex) {
+            let bigint = parseInt(hex.slice(1), 16);
+            let r = (bigint >> 16) & 255;
+            let g = (bigint >> 8) & 255;
+            let b = bigint & 255;
+            return { r, g, b };
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return {
+                h: Math.round(h * 360),
+                s: Math.round(s * 100),
+                l: Math.round(l * 100)
+            };
+        }
+
+        function updateColorPickerValues(hex) {
+            document.getElementById('color-preview-box').style.backgroundColor = hex;
+            document.getElementById('code-hex').innerText = hex;
+            
+            let rgbObj = hexToRgb(hex);
+            let rgbStr = `rgb(${rgbObj.r}, ${rgbObj.g}, ${rgbObj.b})`;
+            document.getElementById('code-rgb').innerText = rgbStr;
+
+            let hslObj = rgbToHsl(rgbObj.r, rgbObj.g, rgbObj.b);
+            let hslStr = `hsl(${hslObj.h}, ${hslObj.s}%, ${hslObj.l}%)`;
+            document.getElementById('code-hsl').innerText = hslStr;
+        }
+
+        function copyColorCode(type) {
+            let text = '';
+            if (type === 'hex') text = document.getElementById('code-hex').innerText;
+            if (type === 'rgb') text = document.getElementById('code-rgb').innerText;
+            if (type === 'hsl') text = document.getElementById('code-hsl').innerText;
+            
+            copyToClipboard(text, 'Code copied!');
+        }
+
+        document.getElementById('color-picker-input').addEventListener('input', (e) => {
+            updateColorPickerValues(e.target.value);
+        });
+
+        // --- Challenges Logic ---
+        const challengesData = [
+            { id: 1, title: "1. Buat Heading HTML", diff: "Easy", desc: "Buatlah elemen heading tingkat satu (<h1>) dengan teks 'Halo Gen Z' di dalamnya.", template: "<!-- Tulis kodemu di sini -->\n", solutionCheck: "h1" },
+            { id: 2, title: "2. Buat Tombol Berwarna", desc: "Buat sebuah tombol (<button>) dengan teks 'Klik Aku' dan berikan background warna biru menggunakan style CSS inline atau tag <style>.", template: "<style>\n  /* Tulis CSS di sini */\n</style>\n<button>Klik Aku</button>", solutionCheck: "button" },
+            { id: 3, title: "3. Buat Card Profile", desc: "Buat card profile sederhana berisi nama 'Alex' dan jabatan 'Web Developer' menggunakan tag <div>.", template: "<div style='background:#131c31; padding:20px; border-radius:10px; color:white;'>\n  <!-- Lengkapi card di sini -->\n</div>", solutionCheck: "div" },
+            { id: 4, title: "4. Buat Navbar Sederhana", desc: "Buat struktur navbar dengan list (<ul> dan <li>) berisi menu: Home, About, Contact.", template: "<nav>\n  <ul>\n    <!-- Tambahkan list menu -->\n  </ul>\n</nav>", solutionCheck: "ul" },
+            { id: 5, title: "5. Buat Kalkulator", desc: "Buat input angka dan tombol hasil dengan JavaScript sederhana untuk menjumlahkan 5 + 5.", template: "<input type='number' id='num' value='5'>\n<button onclick='alert(5+5)'>Hitung</button>", solutionCheck: "input" },
+            { id: 6, title: "6. Buat Digital Clock", desc: "Tampilkan waktu saat ini menggunakan elemen <h2 id='clock'> dan fungsi JavaScript setInterval.", template: "<h2 id='clock'>00:00:00</h2>\n<script>\n  // Tulis script jam digital\n<\/script>", solutionCheck: "script" },
+            { id: 7, title: "7. Buat To-Do List", desc: "Buat form input text dan tombol 'Tambah' untuk membuat daftar tugas harian.", template: "<input type='text' placeholder='Tugas baru...'>\n<button>Tambah</button>", solutionCheck: "input" }
+        ];
+
+        function renderChallenges() {
+            const grid = document.getElementById('challenges-grid');
+            grid.innerHTML = '';
+            challengesData.forEach(ch => {
+                grid.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${ch.diff}</span>
+                                <span class="text-xs text-slate-500 font-mono">Challenge #${ch.id}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">${ch.title}</h3>
+                            <p class="text-slate-400 text-xs">${ch.desc}</p>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="openChallenge(${ch.id})" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/30">
+                                Mulai Challenge <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        let activeChallenge = null;
+        function openChallenge(id) {
+            activeChallenge = challengesData.find(c => c.id === id);
+            document.getElementById('ch-detail-title').innerText = activeChallenge.title;
+            document.getElementById('ch-detail-instructions').innerText = activeChallenge.desc;
+            document.getElementById('challenge-badge-diff').innerText = activeChallenge.diff;
+            document.getElementById('ch-code-editor').value = activeChallenge.template;
+            document.getElementById('ch-feedback-status').innerText = 'Belum diuji';
+            document.getElementById('ch-feedback-status').className = 'text-slate-500 font-medium';
+            runChallengeCode();
+            switchView('challenge-detail');
+        }
+
+        function resetCurrentChallenge() {
+            if (activeChallenge) {
+                document.getElementById('ch-code-editor').value = activeChallenge.template;
+                runChallengeCode();
+            }
+        }
+
+        function runChallengeCode() {
+            const code = document.getElementById('ch-code-editor').value;
+            document.getElementById('ch-preview-frame').srcdoc = code;
+        }
+
+        function checkChallengeAnswer() {
+            const code = document.getElementById('ch-code-editor').value.toLowerCase();
+            const status = document.getElementById('ch-feedback-status');
+            if (code.includes(activeChallenge.solutionCheck)) {
+                status.innerText = '✔ Benar & Berhasil! 🎉';
+                status.className = 'text-emerald-500 font-bold';
+                showToast('Code copied!', 'success');
+            } else {
+                status.innerText = '❌ Belum sesuai instruksi.';
+                status.className = 'text-rose-500 font-bold';
+                showToast('Kode belum memenuhi syarat challenge.', 'error');
+            }
+        }
+
+        // --- Quiz Logic ---
+        const quizData = [
+            { q: "Tag HTML apa yang digunakan untuk membuat judul utama paling besar?", code: "", options: ["<h6>", "<header>", "<h1>", "<title>"], answer: 2, exp: "Tag <h1> digunakan untuk heading utama yang paling penting." },
+            { q: "Properti CSS apa yang digunakan untuk mengubah warna teks?", code: "", options: ["text-color", "color", "font-color", "background-color"], answer: 1, exp: "Properti 'color' digunakan untuk menentukan warna teks di CSS." },
+            { q: "Bagaimana cara menulis komentar yang benar di dalam file JavaScript?", code: "", options: ["<!-- Komentar -->", "/* Komentar */", "# Komentar", "// Komentar"], answer: 3, exp: "Komentar satu baris di JavaScript menggunakan simbol //." },
+            { q: "Manakah fungsi yang benar untuk menampilkan pesan pop-up di browser?", code: "", options: ["msg('Halo')", "alert('Halo')", "print('Halo')", "prompt_box('Halo')"], answer: 1, exp: "Fungsi alert('pesan') memunculkan kotak dialog pop-up di browser." },
+            { q: "Apa fungsi dari tag HTML <a>?", code: "", options: ["Membuat gambar", "Membuat tabel", "Membuat hyperlink tautan", "Membuat garis horizontal"], answer: 2, exp: "Tag <a> (anchor) digunakan untuk menghubungkan halaman web satu ke yang lain." },
+            { q: "Di mana posisi penulisan tag <script> JavaScript yang direkomendasikan dalam dokumen HTML?", code: "", options: ["Di dalam tag <head>", "Di awal dokumen", "Sebelum penutup tag </body>", "Di dalam tag <title>"], answer: 2, exp: "Menaruh script sebelum </body> memastikan elemen HTML sudah dimuat terlebih dahulu." },
+            { q: "Manakah operator perbandingan untuk memeriksa kesamaan nilai dan tipe data di JavaScript?", code: "", options: ["==", "===", "=", "!="], answer: 1, exp: "Operator === memeriksa nilai sekaligus tipe data secara ketat (strict equality)." },
+            { q: "Bagaimana cara mengatur jarak di dalam (padding) elemen sebesar 20px di CSS?", code: "", options: ["padding: 20px;", "margin: 20px;", "space: 20px;", "inner-gap: 20px;"], answer: 0, exp: "Padding mengatur ruang kosong di dalam batas elemen." },
+            { q: "Apa hasil dari ekspresi JavaScript: typeof 2026?", code: "", options: ["'string'", "'number'", "'boolean'", "'object'"], answer: 1, exp: "Angka 2026 bertipe data 'number'." },
+            { q: "Framework atau library apa yang paling tepat untuk styling utility dengan cepat di web?", code: "", options: ["Tailwind CSS", "Microsoft Word", "Photoshop", "MySQL"], answer: 0, exp: "Tailwind CSS adalah utility-first CSS framework yang sangat populer." }
+        ];
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        function loadQuizQuestion() {
+            const qObj = quizData[currentQuizIndex];
+            document.getElementById('quiz-progress-indicator').innerText = `Question ${currentQuizIndex + 1} / ${quizData.length}`;
+            document.getElementById('quiz-cat-tag').innerText = "Quiz Coding Interaktif";
+            document.getElementById('quiz-question').innerText = qObj.q;
+            
+            const codeBox = document.getElementById('quiz-code-box');
+            if (qObj.code) {
+                codeBox.classList.remove('hidden');
+                document.getElementById('quiz-code-text').innerText = qObj.code;
+            } else {
+                codeBox.classList.add('hidden');
+            }
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            qObj.options.forEach((opt, idx) => {
+                optionsContainer.innerHTML += `
+                    <button onclick="selectQuizAnswer(${idx})" class="quiz-opt-btn w-full text-left p-4 rounded-xl glass-card border border-darkborder hover:border-indigo-500 text-sm font-medium transition flex items-center justify-between">
+                        <span><strong class="mr-2 text-indigo-400">${String.fromCharCode(65 + idx)}.</strong> ${opt}</span>
+                    </button>
+                `;
+            });
+
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+            document.getElementById('quiz-card').classList.remove('hidden');
+            document.getElementById('quiz-score-screen').classList.add('hidden');
+        }
+
+        function selectQuizAnswer(selectedIdx) {
+            const qObj = quizData[currentQuizIndex];
+            const buttons = document.querySelectorAll('.quiz-opt-btn');
+            
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === qObj.answer) {
+                    btn.className = 'w-full text-left p-4 rounded-xl bg-emerald-500/20 border border-emerald-500 text-emerald-300 text-sm font-semibold flex items-center justify-between';
+                } else if (idx === selectedIdx) {
+                    btn.className = 'w-full text-left p-4 rounded-xl bg-rose-500/20 border border-rose-500 text-rose-300 text-sm font-semibold flex items-center justify-between';
+                } else {
+                    btn.className = 'w-full text-left p-4 rounded-xl glass-card border border-darkborder opacity-50 text-sm font-medium flex items-center justify-between';
+                }
+            });
+
+            const feedbackMsg = document.getElementById('quiz-feedback-msg');
+            if (selectedIdx === qObj.answer) {
+                quizScore += 10;
+                feedbackMsg.innerText = '✔ Jawaban Benar! ' + qObj.exp;
+                feedbackMsg.className = 'text-sm font-semibold p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400';
+            } else {
+                feedbackMsg.innerText = '❌ Jawaban Kurang Tepat. ' + qObj.exp;
+                feedbackMsg.className = 'text-sm font-semibold p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400';
+            }
+
+            document.getElementById('quiz-feedback-box').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizData.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById('quiz-card').classList.add('hidden');
+                document.getElementById('quiz-score-screen').classList.remove('hidden');
+                document.getElementById('quiz-final-score').innerText = `Score: ${quizScore} / 100`;
+                
+                if (quizScore >= 70 && userProgress.js < 100) {
+                    userProgress.js = Math.min(100, userProgress.js + 20);
+                    saveProgress();
+                }
+            }
+        }
+
+        function restartQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            loadQuizQuestion();
+        }
+
+        // --- Projects Data ---
+        const projectsData = [
+            { title: "Kalkulator Sederhana", diff: "Beginner", tech: "HTML, CSS, JS", desc: "Buat kalkulator interaktif untuk penjumlahan, pengurangan, perkalian, dan pembagian.", codeSnippet: "<!-- Kalkulator App -->\n<input id='n1'> + <input id='n2'> <button>=</button>" },
+            { title: "To-Do List App", diff: "Beginner", tech: "HTML, CSS, JS", desc: "Aplikasi pencatat daftar tugas harian dengan fitur tambah dan hapus tugas.", codeSnippet: "<input placeholder='Tugas baru...'> <button>Tambah</button>" },
+            { title: "Digital Clock", diff: "Beginner", tech: "HTML, CSS, JS", desc: "Jam digital real-time yang memperbarui detik, menit, dan jam secara otomatis.", codeSnippet: "<h1 id='clock'>12:00:00</h1>" },
+            { title: "Quiz App Interaktif", diff: "Intermediate", tech: "HTML, CSS, JS", desc: "Aplikasi kuis pilihan ganda dengan sistem skor otomatis.", codeSnippet: "<div id='quiz-box'>Soal 1...</div>" },
+            { title: "Profile Card Responsive", diff: "Beginner", tech: "HTML, CSS", desc: "Kartu profil modern dengan foto, bio singkat, dan tombol sosial media.", codeSnippet: "<div class='card'>\n  <img src='avatar.jpg'>\n  <h3>Alex Developer</h3>\n</div>" },
+            { title: "Landing Page Modern", diff: "Intermediate", tech: "HTML, CSS", desc: "Halaman depan website perusahaan startup dengan hero section dan tombol CTA.", codeSnippet: "<header>\n  <nav>Logo & Menu</nav>\n  <h1>Learn to Code</h1>\n</header>" }
+        ];
+
+        function renderProjects() {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = '';
+            projectsData.forEach(p => {
+                grid.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">${p.diff}</span>
+                                <span class="text-xs text-slate-400 font-mono">${p.tech}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">${p.title}</h3>
+                            <p class="text-slate-400 text-xs">${p.desc}</p>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-slate-300">
+                                <pre>${p.codeSnippet}</pre>
+                            </div>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="startProject('${p.title}')" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center">
+                                Start Project <i class="fa-solid fa-laptop-code ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function startProject(title) {
+            document.getElementById('code-html').value = `<!-- Proyek: ${title} -->\n<div style="text-align:center; padding:40px; font-family:sans-serif;">\n  <h1>${title}</h1>\n  <p>Mulai kembangkan aplikasimu di sini!</p>\n</div>`;
+            document.getElementById('code-css').value = `body { background: #090d16; color: white; }\nh1 { color: #6366f1; }`;
+            document.getElementById('code-js').value = `console.log("Memulai proyek ${title}");`;
+            switchView('playground');
+            runPlayground();
+            showToast('Code copied!', 'success');
+        }
+
+        // --- Cheat Sheet Data ---
+        const cheatSheetData = {
+            html: [
+                { title: "&lt;h1&gt; s/d &lt;h6&gt;", desc: "Membuat judul heading dari ukuran terbesar (1) hingga terkecil (6).", code: "<h1>Judul Utama</h1>" },
+                { title: "&lt;p&gt;", desc: "Membuat paragraf teks.", code: "<p>Ini adalah paragraf teks web.</p>" },
+                { title: "&lt;a href='...'&gt;", desc: "Membuat hyperlink tautan web.", code: "<a href='https://google.com'>Link Google</a>" },
+                { title: "&lt;img src='...-&gt;", desc: "Menampilkan gambar.", code: "<img src='gambar.jpg' alt='Foto'>" },
+                { title: "&lt;ul&gt; &amp; &lt;li&gt;", desc: "Membuat daftar item tidak berurutan.", code: "<ul><li>Item 1</li></ul>" },
+                { title: "&lt;form&gt;", desc: "Wadah formulir input data pengguna.", code: "<form><input type='text'></form>" }
+            ],
+            css: [
+                { title: "color", desc: "Mengatur warna teks.", code: "color: #6366f1;" },
+                { title: "background-color", desc: "Mengatur warna latar belakang.", code: "background-color: #090d16;" },
+                { title: "padding", desc: "Mengatur jarak di dalam elemen.", code: "padding: 16px;" },
+                { title: "margin", desc: "Mengatur jarak di luar elemen.", code: "margin: 20px auto;" },
+                { title: "display: flex", desc: "Mengaktifkan sistem layout Flexbox.", code: "display: flex; justify-content: center;" },
+                { title: "border-radius", desc: "Membuat sudut elemen melengkung.", code: "border-radius: 12px;" }
+            ],
+            js: [
+                { title: "console.log()", desc: "Menampilkan pesan di konsol browser.", code: "console.log('Halo dunia');" },
+                { title: "document.getElementById()", desc: "Mengambil elemen HTML berdasarkan ID.", code: "let el = document.getElementById('judul');" },
+                { title: "alert()", desc: "Memunculkan pop-up pemberitahuan.", code: "alert('Peringatan!');" },
+                { title: "Array.push()", desc: "Menambah item baru ke dalam array.", code: "let buah = ['apel']; buah.push('jeruk');" },
+                { title: "Math.random()", desc: "Menghasilkan angka acak antara 0 dan 1.", code: "let acak = Math.random();" }
+            ],
+            syntax: [
+                { title: "Variabel (let & const)", desc: "Menyimpan data nilai.", code: "let skor = 100;\nconst nama = 'CodePlay';" },
+                { title: "Fungsi (Function)", desc: "Blok kode modular yang dapat dipanggil.", code: "function tambah(a, b) {\n  return a + b;\n}" },
+                { title: "Kondisi If / Else", desc: "Percabangan logika program.", code: "if (skor > 75) {\n  console.log('Lulus');\n} else {\n  console.log('Remidi');\n}" },
+                { title: "Perulangan For", desc: "Looping berulang.", code: "for (let i = 0; i < 5; i++) {\n  console.log(i);\n}" }
+            ]
+        };
+
+        function filterCheatSheet(category) {
+            ['html', 'css', 'js', 'syntax'].forEach(cat => {
+                const btn = document.getElementById('cs-tab-' + cat);
+                if (cat === category) {
+                    btn.className = 'cs-tab px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
+                } else {
+                    btn.className = 'cs-tab px-4 py-2 rounded-xl text-xs font-bold bg-darkcard text-slate-300 hover:bg-slate-800 transition';
+                }
+            });
+
+            const grid = document.getElementById('cheatsheet-grid');
+            grid.innerHTML = '';
+            cheatSheetData[category].forEach(item => {
+                grid.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-white font-mono">${item.title}</h3>
+                            <button onclick="copyCheatCode('${encodeURIComponent(item.code)}')" class="text-xs text-indigo-400 hover:underline flex items-center">
+                                <i class="fa-regular fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                        <p class="text-slate-400 text-xs">${item.desc}</p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-darkborder font-mono text-xs text-slate-300">
+                            <pre>${item.code}</pre>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function copyCheatCode(encodedCode) {
+            const code = decodeURIComponent(encodedCode);
+            copyToClipboard(code, 'Code copied!');
+        }
+
+        // --- Initialize App on Load ---
+        window.addEventListener('DOMContentLoaded', () => {
+            updateProgressUI();
+            resetPlayground();
+            renderChallenges();
+            renderProjects();
+            loadQuizQuestion();
+            filterCheatSheet('html');
+            updateButtonGenerator();
+            updateCardGenerator();
+            updateTextStyleGenerator();
+        });
+    </script>
+</body>
+</html>
